@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Kod Oluşturma</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body>
+<header>
+  ⚡ Modern Araçlar Sitesi
+  <button id="menuToggle" class="menu-toggle">☰</button>
+</header>
+
+<div class="layout">
+  
+  <aside id="sidebar" class="sidebar">
+    <ul>
+      <li><a href="index.html" >🏠 Anasayfa</a></li>
+      <li><a href="image-resize.html">📏 Görsel Boyutlandırma</a></li>
+      <li><a href="image-enhance.html">✨ Görsel Kalitesi Artırma</a></li>
+      <li><a href="image-crop.html">✂️ Görsel Kırpma</a></li>
+      <li><a href="barcode.html" >🏷️ Barkod Oluşturma</a></li>
+      <li><a href="qrcode.html" class="active">🔳 QR Kod Oluşturma</a></li>
+    
+    </ul>
+  </aside>
+  <main>
+    <h1>QR Kod Oluşturma</h1>
+    <p>Bir metin girerek QR kod oluşturabilir ve indirebilirsiniz.</p>
+	
+	<div class="guide">
+  <p>Kolayca metin, URL veya diğer bilgileri QR koda dönüştürebilirsiniz. 
+  Metni girip boyut ve renk seçeneklerini belirledikten sonra “QR Kod Oluştur” butonuna tıklayın. 
+  Oluşturulan QR kodu indirebilir veya paylaşabilirsiniz.</p>
+</div>
+    <div class="card">
+      <input type="text" id="qrText" placeholder="Metin girin">
+      <canvas id="qrCanvas"></canvas>
+      <button onclick="makeQR()">Oluştur</button>
+      <button onclick="downloadQR()">İndir</button>
+    </div>
+  </main>
+</div>
+<footer>
+<p>© 2025 Code Together Tech</p>
+  <p>İletişim: <a href="https://instagram.com/codetogethertech" target="_blank" rel="noopener noreferrer">Instagram 📸</a></p></footer>
+  <script src="sidebar-toggle.js"></script>
+<script>
+function makeQR() {
+  const text = document.getElementById('qrText').value;
+  const canvas = document.getElementById('qrCanvas');
+  if(!text){ alert('Lütfen metin girin!'); return; }
+  QRCode.toCanvas(canvas, text, function(error){
+    if(error) alert('QR kod oluşturulamadı: ' + error);
+  });
+}
+
+function downloadQR() {
+  const canvas = document.getElementById('qrCanvas');
+  if(!canvas.toDataURL()) return alert('Önce QR kod oluşturun.');
+  const link = document.createElement('a');
+  link.href = canvas.toDataURL('image/png');
+  link.download = 'qr-code.png';
+  link.click();
+}
+</script>
+</body>
+</html>

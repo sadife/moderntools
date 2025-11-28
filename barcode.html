@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barkod Oluşturma</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Tarayıcı uyumlu JsBarcode -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+</head>
+<body>
+<header>
+  ⚡ Modern Araçlar Sitesi
+  <button id="menuToggle" class="menu-toggle">☰</button>
+</header>
+
+<div class="layout">
+  
+  <aside id="sidebar" class="sidebar">
+    <ul>
+      <li><a href="index.html" >🏠 Anasayfa</a></li>
+      <li><a href="image-resize.html">📏 Görsel Boyutlandırma</a></li>
+      <li><a href="image-enhance.html">✨ Görsel Kalitesi Artırma</a></li>
+      <li><a href="image-crop.html">✂️ Görsel Kırpma</a></li>
+      <li><a href="barcode.html" class="active">🏷️ Barkod Oluşturma</a></li>
+      <li><a href="qrcode.html">🔳 QR Kod Oluşturma</a></li>
+     
+    </ul>
+  </aside>
+  <main>
+    <h1>Barkod Oluşturma</h1>
+    <p>Bir metin girerek barkod oluşturabilir ve indirebilirsiniz.</p>
+	<div class="guide">
+  <p>Bu araç ile istediğiniz metin veya numaraları barkod olarak oluşturabilirsiniz. 
+  Barkod formatını ve boyutunu seçtikten sonra “Barkod Oluştur” butonuna tıklayın. 
+  Oluşturulan barkodu indirebilir veya belgelerinizde kullanabilirsiniz.</p>
+</div>
+    <div class="card">
+      <input type="text" id="barcodeText" placeholder="Metin girin">
+      <svg id="barcode"></svg>
+      <button onclick="makeBarcode()">Oluştur</button>
+      <button onclick="downloadBarcode()">İndir</button>
+    </div>
+  </main>
+</div>
+<footer>
+<p>© 2025 Code Together Tech</p>
+  <p>İletişim: <a href="https://instagram.com/codetogethertech" target="_blank" rel="noopener noreferrer">Instagram 📸</a></p></footer>
+<script src="sidebar-toggle.js"></script>
+<script>
+function makeBarcode() {
+  const text = document.getElementById('barcodeText').value;
+  if(!text){ alert('Lütfen metin girin!'); return; }
+  JsBarcode("#barcode", text, {
+    format:"CODE128",
+    displayValue:true,
+    lineColor:"#000",
+    width:2,
+    height:100
+  });
+}
+
+function downloadBarcode() {
+  const svg = document.getElementById('barcode');
+  const serializer = new XMLSerializer();
+  const source = serializer.serializeToString(svg);
+  const blob = new Blob([source], {type:"image/svg+xml"});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = "barcode.svg";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>

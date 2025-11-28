@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word → PDF</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- jsPDF ve docx.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.17/mammoth.browser.min.js"></script>
+</head>
+<body>
+<header>⚡ Modern Araçlar Sitesi</header>
+<div class="layout">
+  <aside class="sidebar">
+    <ul>
+      <li><a href="index.html">🏠 Anasayfa</a></li>
+      <li><a href="image-resize.html">📏 Görsel Boyutlandırma</a></li>
+      <li><a href="image-enhance.html">✨ Görsel Kalitesi Artırma</a></li>
+      <li><a href="barcode.html">🏷️ Barkod Oluşturma</a></li>
+      <li><a href="qrcode.html">🔳 QR Kod Oluşturma</a></li>
+    </ul>
+  </aside>
+  <main>
+    <h1>Word → PDF</h1>
+    <p>Basit DOCX dosyalarını PDF’ye dönüştürüp indirebilirsiniz.</p>
+    <div class="card">
+      <input type="file" id="docxInput" accept=".docx">
+      <button onclick="convertDocx()">Dönüştür ve İndir</button>
+    </div>
+  </main>
+</div>
+<footer>© 2025 Modern Araçlar Sitesi</footer>
+
+<script>
+async function convertDocx() {
+  const input = document.getElementById('docxInput');
+  if (!input.files.length) { alert('Lütfen bir DOCX dosyası seçin!'); return; }
+  const file = input.files[0];
+
+  // DOCX içeriğini metin olarak al
+  const arrayBuffer = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
+  const text = result.value;
+
+  // jsPDF ile PDF oluştur
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  const lines = pdf.splitTextToSize(text, 180); // Sayfa genişliği 180
+  pdf.text(lines, 15, 20);
+  pdf.save(file.name.replace(/\.docx$/i,'.pdf'));
+}
+</script>
+</body>
+</html>

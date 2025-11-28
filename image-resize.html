@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Görsel Boyutlandırma</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+<header>
+  ⚡ Modern Araçlar Sitesi
+  <button id="menuToggle" class="menu-toggle">☰</button>
+</header>
+
+<div class="layout">
+  
+  <aside id="sidebar" class="sidebar">
+    <ul>
+      <li><a href="index.html" >🏠 Anasayfa</a></li>
+      <li><a href="image-resize.html" class="active">📏 Görsel Boyutlandırma</a></li>
+      <li><a href="image-enhance.html">✨ Görsel Kalitesi Artırma</a></li>
+      <li><a href="image-crop.html">✂️ Görsel Kırpma</a></li>
+      <li><a href="barcode.html" >🏷️ Barkod Oluşturma</a></li>
+      <li><a href="qrcode.html">🔳 QR Kod Oluşturma</a></li>
+     
+    </ul>
+  </aside>
+  <main>
+    <h1>Görsel Boyutlandırma</h1>
+    <p>Resminizi kolayca yeniden boyutlandırın. İster kendi boyutunuzu girin, ister sık kullanılan boyutları seçin veya tüm boyutları oluşturun.</p>
+	<div class="guide">
+    <p>Bu araç ile yüklediğiniz görselleri istediğiniz boyutlarda yeniden boyutlandırabilirsiniz. 
+    Sık kullanılan boyutları seçebilir veya kendi boyutunuzu girebilirsiniz. 
+    “Tüm boyutlardan oluştur” seçeneği ile tüm popüler boyutları ZIP olarak indirebilirsiniz.</p>
+  </div>
+    <div class="card">
+      <input type="file" id="fileInput" accept="image/*">
+
+      <label for="presetSize">Sık Kullanılan Boyutlar:</label>
+      <select id="presetSize">
+        <option value="">Kendi boyutunu gir</option>
+        <option value="800x600">800 x 600</option>
+        <option value="1024x768">1024 x 768</option>
+        <option value="1280x720">1280 x 720 (16:9)</option>
+        <option value="720x1280">720 x 1280 (9:16)</option>
+        <option value="900x1200">900 x 1200 (3:4)</option>
+        <option value="1200x900">1200 x 900 (4:3)</option>
+        <option value="1000x800">1000 x 800 (5:4)</option>
+        <option value="800x1000">800 x 1000 (4:5)</option>
+        <option value="3508x4961">A3 (px)</option>
+        <option value="2480x3508">A4 (px)</option>
+        <option value="1748x2480">A5 (px)</option>
+        <option value="all">Tüm boyutlardan oluştur</option>
+      </select>
+
+      <input type="number" id="widthInput" placeholder="Yeni Genişlik (px)">
+      <input type="number" id="heightInput" placeholder="Yeni Yükseklik (px)">
+      <button onclick="resizeImage()">Boyutlandır ve İndir</button>
+      <canvas id="canvas" style="display:none;"></canvas>
+    </div>
+  </main>
+</div>
+<footer>
+<p>© 2025 Code Together Tech</p>
+  <p>İletişim: <a href="https://instagram.com/codetogethertech" target="_blank" rel="noopener noreferrer">Instagram 📸</a></p></footer>
+<script src="sidebar-toggle.js"></script>
+<script>
+const preset = document.getElementById('presetSize');
+preset.addEventListener('change', () => {
+  const val = preset.value;
+  if(val && val !== 'all'){
+    const [w,h] = val.split('x');
+    document.getElementById('widthInput').value = w;
+    document.getElementById('heightInput').value = h;
+  } else if(val === 'all'){
+    document.getElementById('widthInput').value = '';
+    document.getElementById('heightInput').value = '';
+  } else {
+    document.getElementById('widthInput').value = '';
+    document.getElementById('heightInput').value = '';
+  }
+});
+
+function resizeImage() {
+  const file = document.getElementById('fileInput').files[0];
+  if (!file) return alert('Lütfen bir resim seçin.');
+  const val = preset.value;
+
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  const img = new Image();
+  img.onload = async () => {
+    if(val === 'all'){
+      const sizes = [
+        [1280,720], [720,1280], [900,1200], [1200,900],
+        [1000,800], [800,1000], [3508,4961], [2480,3508], [1748,2480]
+      ];
+      const zip = new JSZip();
+      for(let i=0;i<sizes.length;i++){
+        const [w,h] = sizes[i];
+        canvas.width = w;
+        canvas.height = h;
+        ctx.drawImage(img,0,0,w,h);
+        const dataURL = canvas.toDataURL('image/jpeg');
+        const imgData = dataURL.split(',')[1];
+        zip.file(`resized_${w}x${h}.jpg`, imgData, {base64:true});
+      }
+      const content = await zip.generateAsync({type:"blob"});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(content);
+      link.download = 'resized_images.zip';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    } else {
+      const width = parseInt(document.getElementById('widthInput').value);
+      const height = parseInt(document.getElementById('heightInput').value);
+      if(!width || !height) return alert('Genişlik ve yükseklik değerlerini girin!');
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img,0,0,width,height);
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/jpeg');
+      link.download = 'resized.jpg';
+      link.click();
+    }
+  };
+  img.src = URL.createObjectURL(file);
+}
+</script>
+</body>
+</html>

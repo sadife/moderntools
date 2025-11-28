@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Görsel Kalitesi Artırma</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  ⚡ Modern Araçlar Sitesi
+  <button id="menuToggle" class="menu-toggle">☰</button>
+</header>
+
+<div class="layout">
+  
+  <aside id="sidebar" class="sidebar">
+    <ul>
+      <li><a href="index.html" >🏠 Anasayfa</a></li>
+      <li><a href="image-resize.html" >📏 Görsel Boyutlandırma</a></li>
+      <li><a href="image-enhance.html" class="active">✨ Görsel Kalitesi Artırma</a></li>
+      <li><a href="image-crop.html">✂️ Görsel Kırpma</a></li>
+      <li><a href="barcode.html" >🏷️ Barkod Oluşturma</a></li>
+      <li><a href="qrcode.html">🔳 QR Kod Oluşturma</a></li>
+     
+    </ul>
+  </aside>
+
+  <main>
+    <h1>Görsel Kalitesi Artırma</h1>
+    <p>Resminizin çözünürlüğünü artırabilir ve sık kullanılan DPI seçeneklerinden faydalanabilirsiniz.</p>
+	
+	<div class="guide">
+  <p>Bu araç ile yüklediğiniz görsellerin çözünürlüğünü artırabilir ve daha yüksek kalitede indirebilirsiniz. 
+  Önceden tanımlı 4K veya 8K seçeneklerinden birini seçebilir veya kendi genişlik/yükseklik değerlerinizi girebilirsiniz. 
+  Sık kullanılan DPI seçeneklerinden birini seçerek kaliteyi özelleştirebilirsiniz.</p>
+</div>
+    <div class="card">
+      <input type="file" id="fileInput" accept="image/*">
+
+      <label for="resolutionPreset">Çözünürlük Seçenekleri:</label>
+      <select id="resolutionPreset">
+        <option value="">Kendi çözünürlüğünü gir</option>
+        <option value="3840x2160">4K (3840x2160)</option>
+        <option value="7680x4320">8K (7680x4320)</option>
+      </select>
+
+      <label for="dpiPreset">Sık Kullanılan DPI:</label>
+      <select id="dpiPreset">
+        <option value="">Kendi DPI değerini gir</option>
+        <option value="72">72 DPI</option>
+        <option value="150">150 DPI</option>
+        <option value="300">300 DPI</option>
+      </select>
+
+      <input type="number" id="widthInput" placeholder="Genişlik (px)">
+      <input type="number" id="heightInput" placeholder="Yükseklik (px)">
+      <input type="number" id="dpiInput" placeholder="DPI">
+
+      <button onclick="enhanceImage()">Kaliteyi Artır ve İndir</button>
+      <canvas id="canvas" style="display:none;"></canvas>
+    </div>
+  </main>
+</div>
+<footer>
+<p>© 2025 Code Together Tech</p>
+  <p>İletişim: <a href="https://instagram.com/codetogethertech" target="_blank" rel="noopener noreferrer">Instagram 📸</a></p></footer>
+<script src="sidebar-toggle.js"></script>
+<script>
+const resolutionPreset = document.getElementById('resolutionPreset');
+const dpiPreset = document.getElementById('dpiPreset');
+
+resolutionPreset.addEventListener('change', () => {
+  if(resolutionPreset.value){
+    const [w,h] = resolutionPreset.value.split('x');
+    document.getElementById('widthInput').value = w;
+    document.getElementById('heightInput').value = h;
+  } else {
+    document.getElementById('widthInput').value = '';
+    document.getElementById('heightInput').value = '';
+  }
+});
+
+dpiPreset.addEventListener('change', () => {
+  if(dpiPreset.value){
+    document.getElementById('dpiInput').value = dpiPreset.value;
+  } else {
+    document.getElementById('dpiInput').value = '';
+  }
+});
+
+function enhanceImage() {
+  const file = document.getElementById('fileInput').files[0];
+  if(!file) return alert('Lütfen bir resim seçin.');
+
+  const width = parseInt(document.getElementById('widthInput').value);
+  const height = parseInt(document.getElementById('heightInput').value);
+  const dpi = parseInt(document.getElementById('dpiInput').value) || 72;
+
+  if(!width || !height) return alert('Genişlik ve yükseklik değerlerini girin!');
+
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.getElementById('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img,0,0,width,height);
+
+    // DPI bilgisini resimle ilişkilendirmek için MIME tipinde XMP veya basit bir workaround kullanılabilir.
+    // jsPDF veya canvas.toBlob ile DPI bilgisi PDF için kullanılabilir.
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = 'enhanced.png';
+    link.click();
+  };
+  img.src = URL.createObjectURL(file);
+}
+</script>
+</body>
+</html>
